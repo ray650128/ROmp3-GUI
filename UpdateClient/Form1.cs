@@ -263,5 +263,28 @@ namespace UpdateClient
             }
             catch { }
         }
+
+        private void btnRunRO_Click(object sender, EventArgs e)
+        {
+            ProcessStartInfo Ragnarok = new ProcessStartInfo();
+            // FileName 是要執行的檔案
+            Ragnarok.FileName = "Ragnarok.exe";
+            Ragnarok.WorkingDirectory = Application.StartupPath + @"\..\";//檔案所在的目錄
+
+            try
+            {
+                Process.Start(Ragnarok);
+                Application.Exit();
+            }
+            catch (Exception error)
+            {
+                //Console.WriteLine(err.ToString());
+                MessageBox.Show(
+                    "找不到 Ragnarok.exe \n 於：\n" + Application.StartupPath + @"\..\",
+                    "錯誤",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+            }
+        }
     }
 }

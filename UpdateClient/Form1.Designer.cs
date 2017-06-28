@@ -39,6 +39,7 @@
             this.linkPokepe = new System.Windows.Forms.LinkLabel();
             this.linkBahamut = new System.Windows.Forms.LinkLabel();
             this.linkGNJOY = new System.Windows.Forms.LinkLabel();
+            this.btnRunRO = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // txtUpdLnk
@@ -47,16 +48,16 @@
             this.txtUpdLnk.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(192)))));
             this.txtUpdLnk.Location = new System.Drawing.Point(12, 316);
             this.txtUpdLnk.Name = "txtUpdLnk";
-            this.txtUpdLnk.Size = new System.Drawing.Size(231, 37);
+            this.txtUpdLnk.Size = new System.Drawing.Size(201, 37);
             this.txtUpdLnk.TabIndex = 0;
             this.txtUpdLnk.Text = "@null";
             this.txtUpdLnk.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // btnStart
             // 
-            this.btnStart.Location = new System.Drawing.Point(249, 319);
+            this.btnStart.Location = new System.Drawing.Point(219, 319);
             this.btnStart.Name = "btnStart";
-            this.btnStart.Size = new System.Drawing.Size(75, 50);
+            this.btnStart.Size = new System.Drawing.Size(105, 26);
             this.btnStart.TabIndex = 1;
             this.btnStart.Text = "開始遊戲";
             this.btnStart.UseVisualStyleBackColor = true;
@@ -87,7 +88,7 @@
             // 
             this.btnSet.Location = new System.Drawing.Point(330, 319);
             this.btnSet.Name = "btnSet";
-            this.btnSet.Size = new System.Drawing.Size(75, 50);
+            this.btnSet.Size = new System.Drawing.Size(75, 58);
             this.btnSet.TabIndex = 5;
             this.btnSet.Text = "設定";
             this.btnSet.UseVisualStyleBackColor = true;
@@ -152,11 +153,22 @@
             this.linkGNJOY.Text = "GNJOY";
             this.linkGNJOY.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkGNJOY_LinkClicked);
             // 
+            // btnRunRO
+            // 
+            this.btnRunRO.Location = new System.Drawing.Point(219, 351);
+            this.btnRunRO.Name = "btnRunRO";
+            this.btnRunRO.Size = new System.Drawing.Size(105, 26);
+            this.btnRunRO.TabIndex = 11;
+            this.btnRunRO.Text = "執行官方登入器";
+            this.btnRunRO.UseVisualStyleBackColor = true;
+            this.btnRunRO.Click += new System.EventHandler(this.btnRunRO_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(417, 381);
+            this.ClientSize = new System.Drawing.Size(417, 388);
+            this.Controls.Add(this.btnRunRO);
             this.Controls.Add(this.linkGNJOY);
             this.Controls.Add(this.linkBahamut);
             this.Controls.Add(this.linkPokepe);
@@ -191,6 +203,7 @@
         private System.Windows.Forms.LinkLabel linkPokepe;
         private System.Windows.Forms.LinkLabel linkBahamut;
         private System.Windows.Forms.LinkLabel linkGNJOY;
+        private System.Windows.Forms.Button btnRunRO;
     }
 }
 
