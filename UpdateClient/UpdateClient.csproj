@@ -111,6 +111,19 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="icon.ico" />
+    <None Include="Resources\default\basic_interface\midbar_right.bmp" />
+    <None Include="Resources\default\basic_interface\midbar_left.bmp" />
+    <None Include="Resources\default\basic_interface\btnbar_right.bmp" />
+    <None Include="Resources\default\basic_interface\btnbar_mid.bmp" />
+    <None Include="Resources\default\basic_interface\btnbar_left.bmp" />
+    <None Include="Resources\default\basic_interface\btn_null_on.bmp" />
+    <None Include="Resources\default\basic_interface\btn_null_off.bmp" />
+    <None Include="Resources\default\basic_interface\btn_null_dis.bmp" />
+    <None Include="Resources\default\basic_interface\sys_close_off.bmp" />
+    <None Include="Resources\default\basic_interface\sys_close_on.bmp" />
+    <None Include="Resources\default\basic_interface\titlebar_right.bmp" />
+    <None Include="Resources\default\basic_interface\titlebar_mid.bmp" />
+    <None Include="Resources\default\basic_interface\titlebar_left.bmp" />
     <None Include="Resources\icon.ico" />
   </ItemGroup>
   <ItemGroup>

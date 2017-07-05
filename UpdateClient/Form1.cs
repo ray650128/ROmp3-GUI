@@ -4,12 +4,14 @@ using System.Windows.Forms;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
 using System.Net.NetworkInformation;
+using System.Drawing;
 
 namespace UpdateClient
 {
     public partial class Form1 : Form
     {
         private Process curProcess = new Process();
+        private Point mouse_offset;
 
         public Form1()
         {
@@ -20,8 +22,9 @@ namespace UpdateClient
         {
             //curProcess.CancelOutputRead();//取消異步操作
             //curProcess.Kill();
-            //如果需要手動關閉，則關閉后再進行初始化
+
             UpdateUIBtn(false, btnStart);
+            UpdateUIBtn(false, btnRunRO);
             ReadVersionTxt();
 
             if(PingUpdateServer("www.google.com.tw"/*"114.35.135.2"*/))
@@ -37,6 +40,8 @@ namespace UpdateClient
                     "沒有連線", 
                     MessageBoxButtons.OK, 
                     MessageBoxIcon.Error);
+
+                Application.Exit();
             }
         }
 
@@ -72,20 +77,35 @@ namespace UpdateClient
         
         private void RunDataUpdateBatch()
         {
-            curProcess.OutputDataReceived -= new DataReceivedEventHandler(ProcessOutDataReceived);
-            ProcessStartInfo p = new ProcessStartInfo();
-            p.FileName = "data_update.bat";
-            p.UseShellExecute = false;
-            p.WindowStyle = ProcessWindowStyle.Hidden;
-            p.CreateNoWindow = true;
-            p.RedirectStandardError = true;
-            p.RedirectStandardInput = true;
-            p.RedirectStandardOutput = true;
-            curProcess.StartInfo = p;
-            curProcess.Start();
+            if (File.Exists("data_update.bat"))
+            {
+                curProcess.OutputDataReceived -= new DataReceivedEventHandler(ProcessOutDataReceived);
+                ProcessStartInfo p = new ProcessStartInfo();
+                p.FileName = "data_update.bat";
+                p.UseShellExecute = false;
+                p.WindowStyle = ProcessWindowStyle.Hidden;
+                p.CreateNoWindow = true;
+                p.RedirectStandardError = true;
+                p.RedirectStandardInput = true;
+                p.RedirectStandardOutput = true;
+                curProcess.StartInfo = p;
+                curProcess.Start();
 
-            curProcess.BeginOutputReadLine();
-            curProcess.OutputDataReceived += new DataReceivedEventHandler(ProcessOutDataReceived);
+                curProcess.BeginOutputReadLine();
+                curProcess.OutputDataReceived += new DataReceivedEventHandler(ProcessOutDataReceived);
+            }
+            else
+            {
+                MessageBox.Show(
+                    "由於找不到 ROmp3 修正檔套件中的：\n" +
+                    "data_update.bat 批次檔\n" +
+                    "程式結束。",
+                    "錯誤",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+
+                Application.Exit();
+            }
         }
         
         private void ReadVersionTxt()
@@ -143,7 +163,6 @@ namespace UpdateClient
 
         public void RunTextView(string text)
         {
-
             if (text != null)
             {
                 if (text.Contains("Getting update information"))
@@ -158,7 +177,10 @@ namespace UpdateClient
                 }
                 else if (text.Contains("解壓縮"))
                 {
-                    progBar.Value += 10;
+                    if (progBar.Value < 80)
+                    {
+                        progBar.Value = 50;
+                    }
                 }
                 else if (text.Contains("全部確認"))
                 {
@@ -173,6 +195,7 @@ namespace UpdateClient
                     UpdateUIText("資料更新完畢。", txtUpdLnk);
                     progBar.Value = 100;
                     UpdateUIBtn(true, btnStart);
+                    UpdateUIBtn(true, btnRunRO);
                     ReadVersionTxt();
                 }
                 else if (text.Contains("You already have the latest version"))
@@ -180,61 +203,48 @@ namespace UpdateClient
                     UpdateUIText("你已經是最新版本了。", txtUpdLnk);
                     progBar.Value = 100;
                     UpdateUIBtn(true, btnStart);
-                }
-                else if (text.Contains("全部確認"))
-                {
-                    progBar.Value = 80;
+                    UpdateUIBtn(true, btnRunRO);
                 }
             }
         }
         
-        private void btnStart_Click(object sender, EventArgs e)
+        private void RunExternalEXE(string exename, string argument)
         {
-            // Ragexe.exe "1free1 /account:clientinfo1.xml"
-            ProcessStartInfo Ragexe = new ProcessStartInfo();
+            ProcessStartInfo RunEXE = new ProcessStartInfo();
             // FileName 是要執行的檔案
-            Ragexe.FileName = "Ragexe.exe";
-            Ragexe.Arguments = "1free1 /account:clientinfo1.xml";
-            Ragexe.WorkingDirectory = Application.StartupPath + @"\..\";//檔案所在的目錄
+            RunEXE.FileName = exename;
+            RunEXE.Arguments = argument;
+            RunEXE.WorkingDirectory = Application.StartupPath + @"\..\";//檔案所在的目錄
 
             try
             {
-                Process.Start(Ragexe);
-                Application.Exit();
-            }
-            catch(Exception error)
-            {
-                //Console.WriteLine(err.ToString());
-                MessageBox.Show(
-                    "找不到 Ragexe.exe \n 於：\n" + Application.StartupPath + @"\..\", 
-                    "錯誤", 
-                    MessageBoxButtons.OK, 
-                    MessageBoxIcon.Error);
-            }
-        }
-
-        private void btnSet_Click(object sender, EventArgs e)
-        {
-            // Ragexe.exe "1free1 /account:clientinfo1.xml"
-            ProcessStartInfo Ragexe = new ProcessStartInfo();
-            // FileName 是要執行的檔案
-            Ragexe.FileName = "Setup.exe";
-            Ragexe.WorkingDirectory = Application.StartupPath + @"\..\";//檔案所在的目錄
-
-            try
-            {
-                Process.Start(Ragexe);
+                Process.Start(RunEXE);
                 Application.Exit();
             }
             catch (Exception error)
             {
                 //Console.WriteLine(err.ToString());
                 MessageBox.Show(
-                    "找不到 Setup.exe \n 於：\n" + Application.StartupPath + @"\..\", 
-                    "錯誤", 
-                    MessageBoxButtons.OK, 
+                    "找不到 " + exename + " \n 於：\n" + Application.StartupPath + @"\..\",
+                    "錯誤",
+                    MessageBoxButtons.OK,
                     MessageBoxIcon.Error);
             }
+        }
+
+        private void btnStart_Click(object sender, EventArgs e)
+        {
+            RunExternalEXE("Ragexe.exe", "1free1 /account:clientinfo1.xml");
+        }
+
+        private void btnSet_Click(object sender, EventArgs e)
+        {
+            RunExternalEXE("Setup.exe", "");
+        }
+
+        private void btnRunRO_Click(object sender, EventArgs e)
+        {
+            RunExternalEXE("Ragnarok.exe", "");
         }
 
         private void linkPokepe_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
@@ -264,27 +274,87 @@ namespace UpdateClient
             catch { }
         }
 
-        private void btnRunRO_Click(object sender, EventArgs e)
+        private void Form1_MouseDown(object sender, MouseEventArgs e)
         {
-            ProcessStartInfo Ragnarok = new ProcessStartInfo();
-            // FileName 是要執行的檔案
-            Ragnarok.FileName = "Ragnarok.exe";
-            Ragnarok.WorkingDirectory = Application.StartupPath + @"\..\";//檔案所在的目錄
+            mouse_offset = new Point(-e.X, -e.Y);
+        }
 
-            try
+        private void Form1_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left)
             {
-                Process.Start(Ragnarok);
-                Application.Exit();
+                Point mousePos = Control.MousePosition;
+                mousePos.Offset(mouse_offset.X, mouse_offset.Y);
+                Location = mousePos;
             }
-            catch (Exception error)
+        }
+
+        private void TitleBar_MouseUp(object sender, MouseEventArgs e)
+        {
+            this.Opacity = 1;
+        }
+
+        private void TitleBar_MouseDown(object sender, MouseEventArgs e)
+        {
+            mouse_offset = new Point(-e.X, -e.Y);
+            this.Opacity = 0.50;
+        }
+
+        private void TitleBar_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left)
             {
-                //Console.WriteLine(err.ToString());
-                MessageBox.Show(
-                    "找不到 Ragnarok.exe \n 於：\n" + Application.StartupPath + @"\..\",
-                    "錯誤",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Error);
+                Point mousePos = Control.MousePosition;
+                mousePos.Offset(mouse_offset.X, mouse_offset.Y);
+                Location = mousePos;
             }
+        }
+
+        private void CloseBtn_Click(object sender, EventArgs e)
+        {
+            Application.Exit();
+        }
+
+        private void CloseBtn_MouseMove(object sender, MouseEventArgs e)
+        {
+            closeBtn.BackgroundImage = Properties.Resources.sys_close_on;
+        }
+
+        private void CloseBtn_MouseLeave(object sender, EventArgs e)
+        {
+            closeBtn.BackgroundImage = Properties.Resources.sys_close_off;
+        }
+
+        private void Button_MouseMove(object sender, MouseEventArgs e)
+        {
+            ((Button)(sender)).BackgroundImage = Properties.Resources.btn_null_on;
+        }
+
+        private void Button_MouseLeave(object sender, EventArgs e)
+        {
+            ((Button)(sender)).BackgroundImage = Properties.Resources.btn_null_off;
+        }
+
+        private void Button_EnabledChanged(object sender, EventArgs e)
+        {
+            if(((Button)(sender)).Enabled)
+            {
+                ((Button)(sender)).BackgroundImage = Properties.Resources.btn_null_off;
+            }
+            else
+            {
+                ((Button)(sender)).BackgroundImage = Properties.Resources.btn_null_dis;
+            }
+        }
+
+        private void HyperLink_MouseMove(object sender, MouseEventArgs e)
+        {
+            ((LinkLabel)(sender)).LinkColor = Color.Aqua;
+        }
+
+        private void HyperLink_MouseLeave(object sender, EventArgs e)
+        {
+            ((LinkLabel)(sender)).LinkColor = Color.Green;
         }
     }
 }
